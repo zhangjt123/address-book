@@ -3,38 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>通讯录</title>
+  <title>通讯录 · 极限编程</title>
+  <meta name="description" content="软件工程极限编程作业：Web 版通讯录系统，支持收藏、多联系方式与 Excel 导入导出">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+  <!-- ===== 顶部导航 ===== -->
   <header class="navbar">
     <div class="navbar-inner">
-      <div class="navbar-logo"><span class="logo-icon">📇</span><span>通讯录</span></div>
+      <div class="navbar-logo">
+        <span class="logo-icon">📇</span>
+        <span>通讯录</span>
+      </div>
+      <div class="navbar-actions">
+        <button class="btn btn-light" id="exportBtn" title="导出全部联系人为 Excel">⬇ 导出 Excel</button>
+        <button class="btn btn-light" id="importBtn" title="从 Excel 批量导入联系人">⬆ 导入 Excel</button>
+      </div>
     </div>
   </header>
 
+  <!-- ===== 主内容 ===== -->
   <main class="container">
+
+    <!-- 工具栏：搜索 + 筛选 + 统计 -->
     <section class="toolbar">
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="搜索姓名 / 电话…" autocomplete="off">
+        <input type="text" id="searchInput" placeholder="搜索姓名 / 电话 / 邮箱…" autocomplete="off">
       </div>
-      <div class="tabs">
-        <button class="tab active" id="filterAll">全部</button>
-        <button class="tab" id="filterBookmark">⭐ 收藏</button>
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="filterAll" role="tab">全部</button>
+        <button class="tab" id="filterBookmark" role="tab">⭐ 收藏</button>
       </div>
       <span class="count" id="countText"></span>
       <button class="btn btn-primary" id="addBtn">＋ 新增联系人</button>
     </section>
 
-    <section class="contact-list" id="contactList"></section>
+    <!-- 联系人列表 -->
+    <section class="contact-list" id="contactList" aria-live="polite"></section>
+
+    <!-- 底部辅助操作 -->
+    <div class="footer-tools">
+      <button class="link-btn" id="loadDemoBtn">加载示例数据</button>
+      <span class="dot">·</span>
+      <button class="link-btn danger" id="clearBtn">清空全部联系人</button>
+    </div>
   </main>
 
+  <!-- ===== 新增 / 编辑模态框 ===== -->
   <div class="modal-backdrop" id="modalBackdrop">
-    <div class="modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div class="modal-head">
         <h2 id="modalTitle">新增联系人</h2>
-        <button type="button" class="modal-close" id="modalCloseBtn">✕</button>
+        <button type="button" class="modal-close" id="modalCloseBtn" aria-label="关闭">✕</button>
       </div>
       <form id="contactForm" novalidate>
         <div class="modal-body">
@@ -43,8 +65,9 @@
             <input class="form-input" id="nameInput" placeholder="请输入联系人姓名" autocomplete="off">
           </div>
           <div class="form-group">
-            <label class="form-label" for="phoneInput">电话</label>
-            <input class="form-input" id="phoneInput" placeholder="请输入电话号码">
+            <label class="form-label">联系方式（一个联系人可绑定多个）</label>
+            <div id="methodsBox"></div>
+            <button type="button" class="add-method-btn" id="addMethodBtn">＋ 添加联系方式</button>
           </div>
         </div>
         <div class="modal-foot">
@@ -55,8 +78,32 @@
     </div>
   </div>
 
+  <!-- 联系方式类型候选 -->
+  <datalist id="typeOptions">
+    <option value="电话"></option>
+    <option value="邮箱"></option>
+    <option value="微信"></option>
+    <option value="QQ"></option>
+    <option value="社交账号"></option>
+    <option value="地址"></option>
+    <option value="公司"></option>
+    <option value="备注"></option>
+  </datalist>
+
+  <!-- Excel 导入隐藏文件框 -->
+  <input type="file" id="importFile" accept=".xlsx,.xls,.csv" hidden>
+
+  <!-- Toast 提示 -->
+  <div class="toast" id="toast" role="status"></div>
+
+  <!-- SheetJS（Excel 解析 / 生成） -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- 业务模块 -->
   <script src="js/storage.js"></script>
+  <script src="js/contact.js"></script>
   <script src="js/bookmark.js"></script>
+  <script src="js/excel.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
