@@ -1,152 +1,124 @@
-# 通讯录系统 —— 极限编程作业博客
+# Address Book — Software Engineering Assignment Blog
 
-> 发布前请替换所有 `【】` 占位内容，并补充截图、录屏、GitHub 统计与 PSP 时间。
-> 建议提前 1–2 天发布，留出审核时间。
+> Fill in the bracketed parts, drop in screenshots, and record real PSP times before you publish. Don't leave it to the last minute — the blog needs review time.
 
-## 一、开头信息表
+## 1. Info
 
 | Item | Content |
 |------|---------|
 | Course for This Assignment | Software Engineering (FZU–MU) |
-| Team Name | 【队名 / 个人】 |
-| Assignment Requirements | 开发 Web 版通讯录系统：页面美观（10分）、收藏联系人（25分）、多联系方式（10分）、Excel 导入导出（25分）、可选云部署（+15分）；提交 GitHub 仓库 + 独立技术博客 |
-| Objectives of This Assignment | 掌握极限编程（XP）开发流程与 Git 协作，实践模块化设计、纯前端数据持久化、Excel 文件解析，并完成博客撰写与部署 |
-| Other References | SheetJS (xlsx) 文档、MDN Web Docs、Bootstrap 设计规范、【其他参考资料链接】 |
+| Team Name | 【team name】 |
+| Assignment Requirements | A web address book: polished UI (10), favorite contacts (25), multiple contact methods (10), Excel import/export (25), optional cloud deployment (+15). Deliverables are the code on GitHub plus this blog. |
+| Objectives of This Assignment | Practice the XP workflow and git collaboration, and take a small frontend app from design to a running, deployed result |
+| Other References | SheetJS documentation, MDN Web Docs |
 
-## 二、目录
+## 2. Table of Contents
 
-- [三、项目地址](#三项目地址)
-- [四、GitHub 提交记录与贡献统计](#四github-提交记录与贡献统计)
-- [五、功能实现思路](#五功能实现思路)
-- [六、程序运行截图](#六程序运行截图)
-- [七、完整运行录屏](#七完整运行录屏)
-- [八、团队分工](#八团队分工)
-- [九、贡献占比](#九贡献占比)
-- [十、合作中的困难与解决](#十合作中的困难与解决)
-- [十一、PSP 表格](#十一psp-表格)
+- [1. Info](#1-info)
+- [3. Project Link](#3-project-link)
+- [4. Commits and Contributions](#4-commits-and-contributions)
+- [5. Implementation](#5-implementation)
+- [6. Screenshots](#6-screenshots)
+- [7. Demo Video](#7-demo-video)
+- [8. Division of Work](#8-division-of-work)
+- [9. Contribution](#9-contribution)
+- [10. Problems and Solutions](#10-problems-and-solutions)
+- [11. PSP Tables](#11-psp-tables)
 
-## 三、项目地址
+## 3. Project Link
 
-- GitHub 仓库：https://github.com/【用户名】/【仓库名】
-- 在线访问（云部署，如有）：https://【部署地址】
+- Repo: https://github.com/zhangjt123/address-book
+- Live: https://zhangjt123.github.io/address-book/
 
-## 四、GitHub 提交记录与贡献统计
+## 4. Commits and Contributions
 
-【插入 GitHub 提交记录截图】
+【commit history screenshot】
 
-| 贡献者 | 提交次数 | 说明 |
-|--------|---------|------|
-| 【成员A】 | 【N】次 | 【负责模块】 |
-| 【成员B】 | 【M】次 | 【负责模块】 |
+| Member | Commits | Notes |
+|--------|---------|-------|
+| 【A】 | 【n】 | 【modules they worked on】 |
+| 【B】 | 【m】 | 【modules they worked on】 |
 
-## 五、功能实现思路
+## 5. Implementation
 
-### 技术选型
-本项目采用**纯前端方案**，开发快、部署简单，完全覆盖全部功能要求：
-- 页面：HTML + CSS（手写样式，响应式布局）
-- 逻辑：原生 JavaScript，按模块拆分（IIFE 隔离）
-- 数据：浏览器 `localStorage`，无需后端与数据库
-- Excel：引入 `SheetJS (xlsx)`，纯前端解析与生成
+We went with a pure frontend approach because it covers every requirement without needing a backend. HTML/CSS handle the UI, vanilla JS handles the logic, `localStorage` keeps the data, and SheetJS does the Excel work. The code is split into five small modules so each feature lives in its own file.
 
-### 模块设计
-```
-js/
-├── storage.js   数据持久化（增删改查）
-├── contact.js   联系人模型 + 多联系方式
-├── bookmark.js  收藏功能
-├── excel.js     Excel 导入导出
-└── app.js       主控制器（渲染 + 事件）
-```
+Each contact is stored as:
 
-### 各功能关键实现
-
-**1. 数据模型（多联系方式）**
 ```js
 {
-  id: 唯一标识,
-  name: "姓名",
-  isBookmark: false,          // 是否收藏
-  methods: [                  // 多联系方式
-    { type: "电话", value: "138xxxx" },
-    { type: "邮箱", value: "xx@xx.com" }
-  ]
+  id: "…",
+  name: "…",
+  isBookmark: false,
+  methods: [ { type: "电话", value: "138…" }, … ]
 }
 ```
-一个联系人通过 `methods` 数组绑定任意多种联系方式，新增/编辑表单用「＋ 添加联系方式」动态增删行。
 
-**2. 收藏联系人**
-点击卡片 ★ 按钮切换 `isBookmark` 状态，随即写回 `localStorage`；顶部「全部 / ⭐收藏」Tab 通过 `filter(c => c.isBookmark)` 实现快速筛选。
+Using a `methods` array instead of fixed phone/email fields is what makes multiple contact methods work — a person can have as many entries as they need, each with its own type and value.
 
-**3. Excel 导出**
-用 `XLSX.utils.aoa_to_sheet` 把联系人整理成二维数组：首行表头「姓名｜收藏｜电话｜邮箱｜…」（类型列由 `collectTypes` 动态收集），**一行一人、一列一类信息**，同类多值用 `、` 连接，最后 `XLSX.writeFile` 触发下载。
+**Bookmarking.** The star on each card toggles `isBookmark` and saves right away. The "All / Favorites" tabs are just a filter on that flag.
 
-**4. Excel 导入**
-`FileReader` 读取文件 → `XLSX.read` 解析 → `sheet_to_json({header:1})` 得到二维数组 → 按表头映射：首列姓名、可选的收藏列、其余列作为联系方式类型，单元格内多值按 `、；;，换行` 拆分后批量 `Storage.add` 追加。
+**Excel export.** We flatten the contacts into rows: first column is the name, second is the favorite flag, and the rest are contact method types collected dynamically. One person per row, one type per column, multiple values joined with `、`. Then `XLSX.writeFile` triggers the download.
 
-## 六、程序运行截图
+**Excel import.** The file is read with `FileReader`, parsed with `XLSX.read`, and turned into a two-dimensional array. The header row decides the meaning of each column: `姓名` for name, an optional `收藏` for the flag, and everything else becomes a method type. Cells holding several values get split and appended.
 
-- 主界面（联系人卡片列表 + 统计）
-- 收藏功能（点击 ★ 与「收藏」Tab 筛选）
-- 多联系方式（新增/编辑表单多行输入）
-- Excel 导出结果 / Excel 导入效果
+## 6. Screenshots
 
-【逐项插入截图，并配一句说明】
+- Main list view
+- Favorites filter
+- Add/edit modal with multiple methods
+- Exported Excel file / import result
 
-## 七、完整运行录屏
+【insert a screenshot under each, with a one-line caption】
 
-【上传录屏视频（B站/网盘/GitHub 均可），此处贴链接与简短说明，展示全部功能操作】
+## 7. Demo Video
 
-## 八、团队分工
+【upload the recording and paste the link here, with a short note on what it shows】
 
-| 成员 | 负责模块 |
-|------|---------|
-| 【成员A】 | 【例如：页面样式 + 收藏功能 + 博客排版】 |
-| 【成员B】 | 【例如：多联系方式 + Excel 导入导出 + 部署】 |
+## 8. Division of Work
 
-## 九、贡献占比
+| Member | Work |
+|--------|------|
+| 【A】 | 【e.g. UI + favorites + blog】 |
+| 【B】 | 【e.g. multi-method + Excel + deploy】 |
 
-| 成员 | 贡献占比 |
-|------|---------|
-| 【成员A】 | 【50】% |
-| 【成员B】 | 【50】% |
+## 9. Contribution
 
-（两人占比总和为 100）
+| Member | Share |
+|--------|-------|
+| 【A】 | 【50】% |
+| 【B】 | 【50】% |
 
-## 十、合作中的困难与解决
+## 10. Problems and Solutions
 
-1. **困难**：【例如：两人同时改一个文件导致冲突】
-   **解决**：约定分支与提交规范（`feat:` / `fix:`），各自在独立模块文件内开发，减少合并冲突。
+- **Merge conflicts when two people touch the same file.** We agreed on branch and commit conventions (`feat:`, `fix:`) and kept to separate module files, which cut the conflicts down a lot.
+- **Fitting multiple values into "one column per type".** Export joins same-type values with `、`, import splits them back, so a round trip loses nothing.
+- **localStorage edge cases.** Every read is wrapped in a try-catch so corrupted data falls back to an empty list instead of crashing the page.
 
-2. **困难**：【例如：Excel 多值如何映射到「一列一类」】
-   **解决**：导出时同类多值用顿号合并，导入时按分隔符拆分，保证往返不丢数据。
+【add anything else you actually ran into】
 
-3. **困难**：【例如：localStorage 容量或格式兼容】
-   **解决**：统一数据结构、加 try-catch 容错，损坏时回退空数组。
+## 11. PSP Tables
 
-【按实际情况补充】
+### 【A】
 
-## 十一、PSP 表格
+| Phase | Estimated (min) | Actual (min) |
+|-------|-----------------|--------------|
+| Planning | | |
+| Requirements | | |
+| Design | | |
+| Coding | | |
+| Testing | | |
+| Blog | | |
+| Total | | |
 
-### 成员A
+### 【B】
 
-| PSP 阶段 | 预估耗时（分钟） | 实际耗时（分钟） |
-|---------|----------------|----------------|
-| 计划 | | |
-| 需求分析 | | |
-| 模块设计 | | |
-| 编码实现 | | |
-| 测试调试 | | |
-| 撰写博客 | | |
-| 总计 | | |
-
-### 成员B
-
-| PSP 阶段 | 预估耗时（分钟） | 实际耗时（分钟） |
-|---------|----------------|----------------|
-| 计划 | | |
-| 需求分析 | | |
-| 模块设计 | | |
-| 编码实现 | | |
-| 测试调试 | | |
-| 撰写博客 | | |
-| 总计 | | |
+| Phase | Estimated (min) | Actual (min) |
+|-------|-----------------|--------------|
+| Planning | | |
+| Requirements | | |
+| Design | | |
+| Coding | | |
+| Testing | | |
+| Blog | | |
+| Total | | |

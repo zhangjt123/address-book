@@ -1,117 +1,52 @@
-# 通讯录 · Web 版通讯录系统
+# Address Book
 
-软件工程（FZU–MU）极限编程作业 —— 一个纯前端实现的 Web 通讯录系统，支持联系人增删改查、**收藏**、**多联系方式**、**Excel 导入导出**，界面美观、交互友好。
+A web address book for the Software Engineering (FZU–MU) extreme programming assignment. It's pure frontend — no backend, no build step. Open `index.html` and it runs.
 
-> 无需后端、无需数据库，双击 `index.html` 即可运行；数据保存在浏览器 `localStorage`。
+## Features
 
----
+- Contact CRUD, plus keyword search across names and contact details
+- Favorite/bookmark contacts, with an "All / Favorites" filter tab
+- Multiple contact methods per person (phone, email, WeChat, address, …)
+- Excel import/export
 
-## 功能特性（对照评分点）
+## Tech
 
-| 评分点 | 分值 | 实现说明 |
-|--------|------|----------|
-| 页面样式 | 10 | 渐变导航栏、卡片式列表、响应式布局、模态框、Toast 反馈、hover 动效 |
-| 收藏联系人 | 25 | 卡片 ★ 一键收藏/取消；「全部 / ⭐收藏」Tab 快速筛选收藏联系人 |
-| 多联系方式 | 10 | 一个联系人可绑定电话、邮箱、微信、QQ、地址等多种信息，动态增删 |
-| Excel 导入导出 | 25 | 导出：一行一人、一列一类信息（`.xlsx`）；导入：读取 Excel 批量解析并追加 |
-| 云部署（可选） | +15 | 纯静态站点，可直接部署 GitHub Pages / Vercel / Nginx |
+- HTML + CSS, handwritten
+- Vanilla JS, split into small IIFE modules
+- `localStorage` for persistence
+- [SheetJS](https://sheetjs.com/) (CDN) for Excel
 
-额外能力：姓名/联系方式关键字搜索、联系人数量统计、示例数据、清空、首次运行自动演示数据。
-
----
-
-## 技术栈
-
-- **页面**：HTML + CSS（手写，无 CSS 框架依赖）
-- **逻辑**：原生 JavaScript（ES5 兼容风格 + IIFE 模块隔离）
-- **数据存储**：浏览器 `localStorage`
-- **Excel 处理**：[SheetJS (xlsx)](https://sheetjs.com/) 通过 CDN 引入
-
----
-
-## 目录结构
+## Structure
 
 ```
 address-book/
-├── index.html        # 主页面（列表、筛选、新增/编辑模态框）
-├── css/
-│   └── style.css     # 页面样式
-├── js/
-│   ├── storage.js    # 数据读写（localStorage 增删改查）
-│   ├── contact.js    # 联系人模型 + 多联系方式管理
-│   ├── bookmark.js   # 收藏功能
-│   ├── excel.js      # Excel 导入 / 导出
-│   └── app.js        # 主控制器（渲染 + 事件绑定）
-└── README.md         # 项目说明
+├── index.html
+├── css/style.css
+└── js/
+    ├── storage.js    localStorage CRUD
+    ├── contact.js    contact model + multi-method handling
+    ├── bookmark.js   favorites
+    ├── excel.js      import/export
+    └── app.js        rendering and event wiring
 ```
 
-模块职责清晰、相互解耦，符合作业“提前设计模块”的要求。
+## Run
 
----
-
-## 快速开始
-
-### 方式一：直接打开（最简单）
-
-双击 `index.html`，或在浏览器打开该文件即可。首次运行会自动载入示例数据，方便体验。
-
-### 方式二：本地静态服务器（推荐，规避个别浏览器 file:// 限制）
+Open `index.html` in a browser, or serve it locally:
 
 ```bash
-# 任选其一
-python -m http.server 8080        # Python
-npx serve .                       # Node
+python -m http.server 8080
 ```
 
-然后访问 `http://localhost:8080`。
+Excel import/export loads SheetJS from a CDN, so it needs network access on first use. Contacts are kept in the browser's `localStorage`.
 
-> ⚠️ Excel 导入导出依赖 CDN 的 SheetJS，首次使用需联网；联系人数据仅存本机浏览器。
+## Excel format
 
----
+The first column must be `姓名` (name). An optional `收藏` column takes `是`/`否` for the favorite flag. Every other column header is treated as a contact method type. Multiple values in one cell can be separated by `、`, `;`, `,`, or a newline.
 
-## 使用说明
+## Deploy
 
-1. **新增**：点「＋ 新增联系人」，填姓名，点「＋ 添加联系方式」可加多个类型+内容，保存。
-2. **收藏**：点卡片右上角 ★ 收藏/取消；点顶部「⭐ 收藏」Tab 只看收藏。
-3. **编辑 / 删除**：卡片右侧「编辑」「删除」按钮。
-4. **搜索**：顶部搜索框按姓名、电话、邮箱等关键字实时过滤。
-5. **导出**：点「⬇ 导出 Excel」下载 `.xlsx`（一行一人、一列一类信息）。
-6. **导入**：点「⬆ 导入 Excel」选择 `.xlsx/.xls/.csv`，批量追加到通讯录。
-
-### Excel 格式约定
-
-- 首列必须为 **姓名**；可选 **收藏** 列（值填“是/否”）；其余列的表头作为联系方式类型。
-- 同一单元格内多个值用 `、` `；` `;` `,` 或换行分隔，导入时自动拆分。
-
-示例：
-
-| 姓名 | 收藏 | 电话 | 邮箱 | 地址 |
-|------|------|------|------|------|
-| 张三 | 是 | 13800000000、0591-12345678 | zs@example.com | 福建省福州市 |
-| 李四 | 否 | 13900000000 | | 上海市 |
-
----
-
-## 云部署（可选加分项）
-
-纯前端项目，托管静态文件即可：
-
-- **GitHub Pages**：仓库 `Settings → Pages`，选择分支与 `/ (root)`，发布后获得 `https://<user>.github.io/<repo>/`。
-- **Vercel / Netlify**：导入 GitHub 仓库，框架选「Other/静态」，一键部署。
-- **云服务器 + Nginx**：把项目文件上传到服务器，配置 Nginx 根目录指向本项目即可公网访问。
-
-> 注意：作业要求公网可访问的云服务器（如阿里云/华为云）才计加分，`localhost` 不计分。
-
----
-
-## 提交要求自查
-
-- [x] 提交次数 ≥ 3 次，分阶段提交（项目骨架 → CRUD+收藏 → 多联系方式+Excel → 样式优化）
-- [x] 每人都有 commit 记录（组队时）
-- [ ] GitHub 发布 Release 并向原仓库发起 Pull Request
-- [ ] 独立博客（含信息表、截图、录屏、PSP 表、分工与贡献占比）
-
----
+It's all static files, so GitHub Pages, Vercel, Netlify, or a plain Nginx server all work.
 
 ## License
 
