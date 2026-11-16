@@ -1,16 +1,44 @@
-/* 基础样式 */
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* =========================================================
+   style.css — 通讯录页面样式
+   响应式布局 + 卡片式联系人 + 模态框 + Toast 交互反馈
+   ========================================================= */
 
-body {
-  font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: #f4f5fb;
-  color: #1f2937;
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-soft: #eef2ff;
+  --accent: #f59e0b;
+  --danger: #ef4444;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --bg: #f4f5fb;
+  --card: #ffffff;
+  --border: #e5e7eb;
+  --shadow: 0 1px 3px rgba(0, 0, 0, .06), 0 8px 24px rgba(0, 0, 0, .06);
+  --radius: 14px;
 }
 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+/* ---------- 顶部导航 ---------- */
 .navbar {
   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: #fff;
   box-shadow: 0 2px 12px rgba(79, 70, 229, .35);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 .navbar-inner {
   max-width: 1080px;
@@ -20,19 +48,314 @@ body {
   align-items: center;
   gap: 12px;
 }
-.navbar-logo { font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.navbar-logo {
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .navbar-logo .logo-icon { font-size: 26px; }
+.navbar-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
 
-.container { max-width: 1080px; margin: 0 auto; padding: 24px 20px 40px; }
+/* ---------- 布局容器 ---------- */
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 20px 40px;
+}
 
+/* ---------- 工具栏 ---------- */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.toolbar .count {
+  font-size: 14px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* 搜索框 */
+.search-wrap { position: relative; flex: 1 1 240px; min-width: 200px; }
+.search-wrap .search-icon {
+  position: absolute; left: 12px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted); font-size: 15px; pointer-events: none;
+}
+.search-wrap input {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  background: #fff;
+  transition: border-color .15s, box-shadow .15s;
+}
+.search-wrap input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+/* 筛选 Tab */
+.tabs {
+  display: inline-flex;
+  background: #e9ebf5;
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
+}
+.tab {
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all .15s;
+  font-weight: 500;
+}
+.tab:hover { color: var(--text); }
+.tab.active {
+  background: #fff;
+  color: var(--primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .1);
+  font-weight: 600;
+}
+
+/* ---------- 按钮 ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: transform .1s, box-shadow .15s, background .15s, color .15s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(99, 102, 241, .35); }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-light { background: rgba(255, 255, 255, .18); color: #fff; }
+.btn-light:hover { background: rgba(255, 255, 255, .3); }
+.btn-outline { background: #fff; color: var(--text); border: 1px solid var(--border); }
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+.btn-ghost { background: transparent; color: var(--primary); padding: 6px 10px; }
+.btn-ghost:hover { background: var(--primary-soft); }
+.btn-ghost.danger { color: var(--danger); }
+.btn-ghost.danger:hover { background: #fef2f2; }
+
+/* ---------- 联系人卡片 ---------- */
 .contact-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 16px;
 }
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  transition: transform .15s, box-shadow .15s, border-color .15s;
+  border: 1px solid transparent;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, .08), 0 14px 30px rgba(0, 0, 0, .08);
+  border-color: var(--border);
+}
+.card-avatar {
+  width: 48px; height: 48px; flex-shrink: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff; font-size: 20px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.card-body { flex: 1; min-width: 0; }
+.card-head { display: flex; align-items: center; gap: 8px; }
+.card-name {
+  font-size: 17px; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.star {
+  margin-left: auto;
+  background: none; border: none;
+  font-size: 22px; cursor: pointer;
+  color: #d1d5db; line-height: 1;
+  transition: transform .15s, color .15s;
+}
+.star:hover { transform: scale(1.2); }
+.star.active { color: var(--accent); }
+
+.card-methods { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.badge {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px;
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 5px 9px;
+}
+.badge-type { color: var(--text-muted); flex-shrink: 0; }
+.badge-type::after { content: "："; }
+.badge-value { color: var(--text); word-break: break-all; }
+.muted { color: var(--text-muted); font-size: 13px; }
+
+.card-actions { display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
+
+/* ---------- 空状态 ---------- */
 .empty {
   grid-column: 1 / -1;
   text-align: center;
   padding: 70px 20px;
-  color: #6b7280;
+  color: var(--text-muted);
+}
+.empty-icon { font-size: 52px; margin-bottom: 12px; }
+.empty p { margin-bottom: 18px; font-size: 15px; }
+
+/* ---------- 底部辅助操作 ---------- */
+.footer-tools {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.link-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--primary); font-size: 13px; padding: 4px;
+  font-family: inherit;
+}
+.link-btn:hover { text-decoration: underline; }
+.link-btn.danger { color: var(--danger); }
+.dot { color: var(--border); }
+
+/* ---------- 模态框 ---------- */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(17, 24, 39, .45);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  z-index: 100;
+  overflow-y: auto;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+  animation: modalIn .2s ease;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(-12px) scale(.98); }
+  to { opacity: 1; transform: none; }
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-head h2 { font-size: 18px; }
+.modal-close {
+  background: none; border: none; font-size: 22px; cursor: pointer;
+  color: var(--text-muted); line-height: 1;
+}
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 20px 22px; }
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+.req { color: var(--danger); }
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+}
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+.method-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+.method-type {
+  width: 110px; flex-shrink: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px; font-size: 14px;
+  font-family: inherit;
+}
+.method-value {
+  flex: 1; min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px; font-size: 14px;
+  font-family: inherit;
+}
+.method-remove {
+  width: 34px; height: 34px; flex-shrink: 0;
+  border: none; border-radius: 8px;
+  background: #fef2f2; color: var(--danger);
+  cursor: pointer; font-size: 14px;
+}
+.method-remove:hover { background: #fee2e2; }
+.add-method-btn {
+  background: none; border: 1px dashed var(--primary);
+  color: var(--primary); border-radius: 10px;
+  padding: 8px; width: 100%; cursor: pointer; font-size: 13px;
+  font-family: inherit;
+}
+.add-method-btn:hover { background: var(--primary-soft); }
+.modal-foot {
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding: 16px 22px; border-top: 1px solid var(--border);
+}
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  left: 50%; bottom: 32px;
+  transform: translateX(-50%) translateY(20px);
+  background: #111827;
+  color: #fff;
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all .25s ease;
+  z-index: 200;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 640px) {
+  .navbar-inner { flex-wrap: wrap; }
+  .navbar-actions { margin-left: 0; width: 100%; }
+  .navbar-actions .btn { flex: 1; }
+  .contact-list { grid-template-columns: 1fr; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .tabs { width: 100%; }
+  .tab { flex: 1; }
+  .method-type { width: 90px; }
 }
