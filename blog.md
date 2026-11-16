@@ -90,12 +90,14 @@ Using a `methods` array instead of fixed phone/email fields is what makes multip
 | Member | Work |
 |--------|------|
 | 【your name】 | UI, favorites, multiple contact methods, Excel import/export, deploy, blog |
+| 【teammate name】 | — |
 
 ## 9. Contribution
 
 | Member | Share |
 |--------|-------|
 | 【your name】 | 100% |
+| 【teammate name】 | — |
 
 ## 10. Problems and Solutions
 

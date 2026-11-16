@@ -25,7 +25,6 @@
   var importBtn = $('#importBtn');
   var importFile = $('#importFile');
   var clearBtn = $('#clearBtn');
-  var loadDemoBtn = $('#loadDemoBtn');
 
   var modalBackdrop = $('#modalBackdrop');
   var modalTitle = $('#modalTitle');
@@ -239,34 +238,6 @@
     });
   }
 
-  // ---------- 示例数据 ----------
-  function buildDemoData() {
-    return [
-      Contact.createContact('张伟', [
-        { type: '电话', value: '138-0000-1234' },
-        { type: '电话', value: '0591-12345678' },
-        { type: '邮箱', value: 'zhangwei@example.com' },
-        { type: '微信', value: 'zhangwei_wx' },
-        { type: '地址', value: '福建省福州市鼓楼区' }
-      ], true),
-      Contact.createContact('李娜', [
-        { type: '电话', value: '139-0000-5678' },
-        { type: '邮箱', value: 'lina@example.com' },
-        { type: 'QQ', value: '123456789' },
-        { type: '公司', value: '某某科技有限公司' }
-      ], false),
-      Contact.createContact('王强', [
-        { type: '电话', value: '137-0000-9012' },
-        { type: '社交账号', value: '@wangqiang' },
-        { type: '地址', value: '上海市浦东新区' }
-      ], true)
-    ];
-  }
-
-  function seedDemoData() {
-    buildDemoData().forEach(function (c) { Storage.add(c); });
-  }
-
   // ---------- 事件绑定 ----------
   function bindEvents() {
     // 列表事件委托（卡片操作 + 空状态新增按钮）
@@ -312,13 +283,6 @@
       render();
     });
 
-    loadDemoBtn.addEventListener('click', function () {
-      if (!confirm('加载示例数据会追加到现有通讯录，确定继续吗？')) return;
-      seedDemoData();
-      toast('已加载示例数据');
-      render();
-    });
-
     addMethodBtn.addEventListener('click', function () { addMethodRow(); });
     cancelBtn.addEventListener('click', closeModal);
     modalCloseBtn.addEventListener('click', closeModal);
@@ -338,11 +302,6 @@
   // ---------- 初始化 ----------
   function init() {
     bindEvents();
-    // 首次运行自动载入示例数据，方便体验与演示；可随时「清空全部联系人」
-    if (!localStorage.getItem('addressBook.initialized')) {
-      seedDemoData();
-      localStorage.setItem('addressBook.initialized', '1');
-    }
     render();
   }
 
