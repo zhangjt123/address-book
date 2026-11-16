@@ -11,3 +11,6 @@ Thumbs.db
 
 # 依赖（本项目无，预留）
 node_modules/
+
+# 原始大视频（超过 GitHub 100MB 限制，仅本地保留）
+demo/demo.mp4

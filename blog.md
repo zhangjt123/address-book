@@ -83,7 +83,7 @@ Using a `methods` array instead of fixed phone/email fields is what makes multip
 
 ## 7. Demo Video
 
-【upload the recording and paste the link here】
+[Watch the demo (demo_small.mp4)](https://github.com/zhangjt123/address-book/blob/main/demo/demo_small.mp4)
 
 ## 8. Division of Work
 
