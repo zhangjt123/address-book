@@ -1,6 +1,6 @@
 # Address Book
 
-A web address book for the Software Engineering (FZU–MU) extreme programming assignment. It's pure frontend — no backend, no build step. Open `index.html` and it runs.
+A web address book for the Software Engineering (FZU–MU) extreme programming assignment. Open `index.html` and it runs.
 
 ## Features
 
